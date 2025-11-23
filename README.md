@@ -160,7 +160,6 @@ To use this project:
    Using SSH (recommended if you have access via deploy key):
    ```bash
    git clone git@github.com:FiverrDevProjects/crypto-casino-analytics-pipeline.git
-````
 
 Or using HTTPS (requires GitHub login and personal access token for private repos):
 
