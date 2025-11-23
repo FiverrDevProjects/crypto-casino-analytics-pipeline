@@ -97,7 +97,9 @@ API_URL = "https://min-api.cryptocompare.com/data/v2/histoday"
 
 ## License
 
-This project is licensed under the MIT License.
+
+Copyright (c) 2025  @analytix_pro
+
 
 ---
 
