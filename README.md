@@ -1,7 +1,7 @@
 
 # Crypto Gaming Data Pipeline
 
-This repository contains a Python pipeline for processing, cleaning, and analyzing gaming data with cryptocurrency transactions. It extracts data from `.rar` archives, merges JSON files, enriches them with historical crypto prices, classifies games, calculates USD amounts, and generates summary analytics in both CSV and Excel formats.
+This repository contains a Python pipeline for processing, cleaning, and analyzing gaming data with cryptocurrency transactions. It extracts data from `.rar` archives, merges JSON files, improves them with historical crypto prices, classifies games, calculates USD amounts, and generates summary analytics in both CSV and Excel formats.
 
 ---
 
