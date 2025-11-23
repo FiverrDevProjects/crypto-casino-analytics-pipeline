@@ -93,7 +93,7 @@ You can add the above line to your `~/.zshrc` or `~/.bash_profile` to make it pe
 
    * Press `Win + S`, search for **Environment Variables**, and open **Edit the system environment variables**.
    * Click **Environment Variables…**
-   * Under **System variables**, select `Path` → **Edit…**
+   * Under **System variables**, select `Path` -> **Edit…**
    * Click **New** and add the folder path where `unar.exe` is located (e.g., `C:\Program Files\unar\`).
    * Click **OK** to save.
 
