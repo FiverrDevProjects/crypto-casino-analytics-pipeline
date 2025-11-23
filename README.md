@@ -148,6 +148,54 @@ API_URL = "https://min-api.cryptocompare.com/data/v2/histoday"
 
 ---
 
+
+---
+
+## For Collaborators
+
+To use this project:
+
+1. **Clone the repository**  
+
+   Using SSH (recommended if you have access via deploy key):
+   ```bash
+   git clone git@github.com:FiverrDevProjects/crypto-casino-analytics-pipeline.git
+````
+
+Or using HTTPS (requires GitHub login and personal access token for private repos):
+
+```bash
+git clone https://github.com/FiverrDevProjects/crypto-casino-analytics-pipeline.git
+```
+
+2. **Install dependencies**:
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Add the `.rar` file**
+   Place your `complete_data.rar` archive in the root directory of the cloned repo.
+
+4. **Run the pipeline**:
+
+   ```bash
+   python main.py
+   ```
+
+5. **Outputs**:
+
+   * `cleaned_data_with_crypto.csv` → cleaned and merged data
+   * `analytics.xlsx` → Excel summary analytics
+   * `crypto_price_cache.json` → cached crypto prices
+
+> Note: Generated files are **not included** in the repository. Each collaborator generates them locally after running the pipeline.
+
+
+
+
+---
+
 ## License
 
 Copyright (c) 2025 @analytix_pro
