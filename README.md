@@ -184,9 +184,9 @@ git clone https://github.com/FiverrDevProjects/crypto-casino-analytics-pipeline.
 
 5. **Outputs**:
 
-   * `cleaned_data_with_crypto.csv` → cleaned and merged data
-   * `analytics.xlsx` → Excel summary analytics
-   * `crypto_price_cache.json` → cached crypto prices
+   * `cleaned_data_with_crypto.csv` -> cleaned and merged data
+   * `analytics.xlsx` -> Excel summary analytics
+   * `crypto_price_cache.json` -> cached crypto prices
 
 > Note: Generated files are **not included** in the repository. Each collaborator generates them locally after running the pipeline.
 
