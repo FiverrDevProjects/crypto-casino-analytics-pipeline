@@ -52,6 +52,62 @@ pip install pandas requests xlsxwriter
 
 ## Usage
 
+
+### **macOS**
+
+1. **Using Homebrew (recommended):**
+
+```bash
+brew install unar
+```
+
+2. **Verify installation:**
+
+```bash
+unar -V
+```
+
+You should see the version printed.
+
+3. **If `unar` is not found:**
+
+   * Make sure Homebrew’s bin directory is in your PATH:
+
+```bash
+export PATH="/usr/local/bin:$PATH"
+```
+
+You can add the above line to your `~/.zshrc` or `~/.bash_profile` to make it permanent.
+
+---
+
+### **Windows**
+
+1. **Download Unarchiver for Windows:**
+
+   * Go to [https://theunarchiver.com/command-line](https://theunarchiver.com/command-line) and download the Windows version.
+
+2. **Extract `unar.exe`** to a folder, e.g., `C:\Program Files\unar\`.
+
+3. **Add folder to PATH:**
+
+   * Press `Win + S`, search for **Environment Variables**, and open **Edit the system environment variables**.
+   * Click **Environment Variables…**
+   * Under **System variables**, select `Path` → **Edit…**
+   * Click **New** and add the folder path where `unar.exe` is located (e.g., `C:\Program Files\unar\`).
+   * Click **OK** to save.
+
+4. **Verify installation:**
+
+```cmd
+unar -V
+```
+
+
+
+
+---
+
 1. Place your `.rar` archive (`complete_data.rar`) in the root directory.
 2. Ensure `unar` is installed and available in your system PATH.
 3. Run the pipeline:
