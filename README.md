@@ -37,6 +37,7 @@ pip install pandas requests xlsxwriter
 ## Project Structure
 
 ```
+```
 .
 ├── complete_data.rar             # Source RAR archive with JSON files
 ├── complete_data_extracted/      # Folder where JSON files will be extracted
@@ -45,6 +46,7 @@ pip install pandas requests xlsxwriter
 ├── analytics.xlsx                # Excel summary output
 ├── main.py                       # Main pipeline script
 └── README.md and requirements.txt
+```
 ```
 
 ---
