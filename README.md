@@ -62,9 +62,10 @@ python main.py
 
 **Outputs generated:**
 
-* `cleaned_data_with_crypto.csv` → merged, flattened, and enriched data
-* `analytics.xlsx` → summary analytics and coin price history
-* `crypto_price_cache.json` → cached crypto prices to avoid redundant API calls
+* `cleaned_data_with_crypto.csv` - merged, flattened, and enriched data
+* `analytics.xlsx` - summary analytics and coin price history
+* `crypto_price_cache.json` -
+cached crypto prices to avoid redundant API calls
 
 ---
 
