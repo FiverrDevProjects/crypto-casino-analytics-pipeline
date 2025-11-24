@@ -1,35 +1,63 @@
+from datetime import datetime
 import os
+import sys
+import shutil
 import subprocess
 import json
 import pandas as pd
 import requests
-from datetime import datetime
-from datetime import timezone
-import shutil
+from datetime import datetime, timezone
 
 # ------ BASE ----------------
-# Base directory - main.py 
-try:
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # script folder
-except NameError:
-    BASE_DIR = os.getcwd()  # fallback for notebooks
+# ---------------- PATH FIX FOR EXE ----------------
+# Determine base directory
+if getattr(sys, 'frozen', False):
+    # Running inside PyInstaller bundle
+    BASE_DIR = sys._MEIPASS
+    # Output should go where the EXE is launched from
+    RUNTIME_DIR = os.getcwd()
+else:
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    RUNTIME_DIR = BASE_DIR
 
-# Paths for the .rar and generated json files
-RAR_PATH   = os.path.join(BASE_DIR, "complete_data.rar")
-EXTRACT_TO = os.path.join(BASE_DIR, "complete_data_extracted")
-OUTPUT_CSV = os.path.join(BASE_DIR, "cleaned_data_with_crypto.csv")
-CACHE_PATH = os.path.join(BASE_DIR, "crypto_price_cache.json")
+# Input .rar stays next to script/exe
+RAR_PATH   = os.path.join(RUNTIME_DIR, "complete_data.rar")
 
-# create folder if it doesn't exist
+# Extraction/output go in runtime folder (not inside _MEIPASS)
+EXTRACT_TO = os.path.join(RUNTIME_DIR, "complete_data_extracted")
+OUTPUT_CSV = os.path.join(RUNTIME_DIR, "cleaned_data_with_crypto.csv")
+CACHE_PATH = os.path.join(RUNTIME_DIR, "crypto_price_cache.json")
+
+# unar.exe must be bundled manually with PyInstaller
+UNAR_PATH = os.path.join(BASE_DIR, "unar.exe")
+
+# Check if unar.exe exists
+if not os.path.exists(UNAR_PATH):
+    # Try PATH if user has installed it manually
+    fallback = shutil.which("unar")
+    if fallback:
+        UNAR_PATH = fallback
+    else:
+        raise FileNotFoundError(
+            "unar.exe not found.\n"
+            "Place unar.exe next to the script/exe or install UNAR CLI."
+        )
+
+print(f"Repo base dir (bundle): {BASE_DIR}")
+print(f"Working/output dir: {RUNTIME_DIR}")
+print(f"RAR path: {RAR_PATH}")
+print(f"Extraction folder: {EXTRACT_TO}")
+print(f"Output CSV: {OUTPUT_CSV}")
+print(f"Cache path: {CACHE_PATH}")
+print(f"Using unar at: {UNAR_PATH}")
+
+# re-create extraction folder if missing
 os.makedirs(EXTRACT_TO, exist_ok=True)
 
+# ---------------- END PATH FIX ----------------
+
+
 # -------- TOOLS ----------------
-# find unar in system PATH
-UNAR_PATH = shutil.which("unar")
-if UNAR_PATH is None:
-    raise FileNotFoundError(
-        "unar not found. Please install it: https://theunarchiver.com/command-line"
-    )
 
 #  API for updating historical cripto prices
 API_URL = "https://min-api.cryptocompare.com/data/v2/histoday"
@@ -43,12 +71,19 @@ print(f"Cache path: {CACHE_PATH}")
 print(f"unar path: {UNAR_PATH}")
 
 # ------------------
+
 def extract_rar(rar_path, extract_to):
+    # Remove the old folder if it exists
+    if os.path.exists(extract_to):
+        shutil.rmtree(extract_to)
+        print(f"Removed old extraction folder: {extract_to}")
+
+    # Re-create folder and extract
     os.makedirs(extract_to, exist_ok=True)
-    subprocess.run([UNAR_PATH, "-o", extract_to, rar_path],
-                   check=True,
-                   stdout=subprocess.DEVNULL,
-                   stderr=subprocess.DEVNULL)
+    print(f"Extracting {rar_path} to {extract_to}...")
+    subprocess.run([UNAR_PATH, "-o", extract_to, rar_path], check=True)
+    print("Extraction complete.")
+
 
 def find_json_files(folder):
     json_files = []
@@ -153,12 +188,25 @@ def get_vertical(df):
 
 
 # ---------------- main ----------------
+# ---------------- main ----------------
 def main():
-    # 1. Extracting rar
-    extract_rar(RAR_PATH, EXTRACT_TO)
+    # 1. Check if .rar exists
+    if os.path.exists(RAR_PATH):
+        print(f"Found RAR: {RAR_PATH}, extracting...")
+        extract_rar(RAR_PATH, EXTRACT_TO)
+    else:
+        print(f"No RAR found, using existing folder: {EXTRACT_TO}")
+        if not os.path.exists(EXTRACT_TO):
+            raise FileNotFoundError(
+                f"No RAR and no extracted folder found at {EXTRACT_TO}"
+            )
 
     # 2. Find JSON files
     json_files = find_json_files(EXTRACT_TO)
+    if not json_files:
+        raise FileNotFoundError(f"No JSON files found in {EXTRACT_TO}")
+    
+    print(f"Found {len(json_files)} JSON files. Proceeding with merging...")
 
     # 3. Merging json files
     merged_data = merge_json_files(json_files)
@@ -167,7 +215,7 @@ def main():
     flattened = [flatten_record(entry) for entry in merged_data]
     df = pd.DataFrame(flattened)
 
-    # 5. Convert timestamps to date ----- need this
+    # 5. Convert timestamps to date
     df['createdAt_dt'] = pd.to_datetime(df['createdAt'], unit='ms', errors='coerce')
     df['createdAt_date'] = df['createdAt_dt'].dt.date
 
@@ -185,12 +233,9 @@ def main():
 
     # 9. Calculate USD amounts
     if 'amount' in df.columns:
-        # Convert amount to USD
         df['amount_usd'] = df['amount'] * df['price_usd']
 
-   #---------------------------------------------------------------------
-    # - If payoutMultiplier > 0 -> payout_usd = payout * price_usd  
-    # - If payoutMultiplier == 0 or missing -> payout_usd = amount_usd
+    # 10. payout_usd calculation
     df['payout_usd'] = df.apply(
         lambda row: row['payout'] * row['price_usd']
         if row.get('payoutMultiplier', 0) > 0 and row.get('payout', 0) > 0
@@ -198,32 +243,27 @@ def main():
         axis=1
     )
 
-
-
-    # 10. classify 
+    # 11. classify 
     df_filtered = get_vertical(df)
     df_filtered['game'] = df_filtered['game'].fillna(df['type'])
-
     
     df_filtered = df_filtered[['game','type','value','amount','payout','currency',
                                'expectedAmount','payoutMultiplier','createdAt_dt',
                                'createdAt_date','price_usd','amount_usd','payout_usd','betting']]
 
-    # 11. Adjust betting for certain types
+    # 12. Adjust betting for certain types
     df_filtered.loc[df_filtered['type'].isin(['softswiss','thirdparty']), 'betting'] = 'slot'
     df_filtered = df_filtered.copy()
     df_filtered['expectedAmount'] = df_filtered['expectedAmount'].astype(float)
 
-    # 12. Save 
+    # 13. Save 
     df_filtered.to_csv(OUTPUT_CSV, index=False)
     print(f"Pipeline complete! CSV saved: {OUTPUT_CSV}")
 
-    # 13. Save cache
+    # 14. Save cache
     save_cache(cache)
 
     # ---------------- SUMMARY ----------------
-
-    # payout_usd respects the multiplier rule:
     df_filtered['payout_usd'] = df_filtered.apply(
         lambda row: row['payout']*row['price_usd'] if row['payoutMultiplier'] > 0 else row['amount_usd'],
         axis=1
