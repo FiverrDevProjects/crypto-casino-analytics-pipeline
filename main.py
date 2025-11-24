@@ -320,8 +320,8 @@ def main():
         })
     coin_prices_by_date = pd.DataFrame(coin_price_rows)
 
-    # excel
-    excel_path = os.path.join(BASE_DIR, "analytics.xlsx")
+    # excel path in runtime folder
+    excel_path = os.path.join(RUNTIME_DIR, "analytics.xlsx")
     with pd.ExcelWriter(excel_path, engine="xlsxwriter") as writer:
         summary_sheet.to_excel(writer, sheet_name="summary", index=False, header=False)
         df_filtered.to_excel(writer, sheet_name="main_data", index=False)
