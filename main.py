@@ -81,7 +81,8 @@ def extract_rar(rar_path, extract_to):
     # Re-create folder and extract
     os.makedirs(extract_to, exist_ok=True)
     print(f"Extracting {rar_path} to {extract_to}...")
-    subprocess.run([UNAR_PATH, "-o", extract_to, rar_path], check=True)
+    subprocess.run([UNAR_PATH, "-o", extract_to, rar_path], check=True,
+               stdout=subprocess.DEVNULL)
     print("Extraction complete.")
 
 
